@@ -1,37 +1,52 @@
 {
   "name": "vue-i18n-transform",
-  "version": "0.0.3",
-  "description": "vue-i18n 批量转换文件",
-  "main": "lib/index.js",
-  "directories": {
-    "lib": "lib"
+  "displayName": "vue-i18n-transform",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.65.0"
   },
-  "bin": {
-    "vue-i18n-transform": "lib/index.js"
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vue-i18n-transform.helloWorld",
+        "title": "Hello World"
+      }
+    ]
   },
-  "dependencies": {
-    "chalk": "^4.1.2",
-    "fs-extra": "^10.0.1"
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/node": "^17.0.21",
-    "ts-node": "^10.7.0",
-    "typescript": "^4.6.2"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/zxpsuper/vue-i18n-transform.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/zxpsuper/vue-i18n-transform/issues"
-  },
-  "keywords": [
-    "vue-i18n 批量转换文件",
-    "vue-i18n-change",
-    "vue-i18n ",
-    "vue-i18n-transform"
-  ],
-  "homepage": "https://github.com/zxpsuper/vue-i18n-transform#readme"
+    "@types/glob": "^7.2.0",
+    "@types/mocha": "^9.1.0",
+    "@types/node": "14.x",
+    "@types/vscode": "^1.65.0",
+    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/parser": "^5.12.1",
+    "@vscode/test-electron": "^2.1.2",
+    "eslint": "^8.9.0",
+    "glob": "^7.2.0",
+    "mocha": "^9.2.1",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.5",
+    "validator": "^13.7.0",
+    "webpack": "^5.69.1",
+    "webpack-cli": "^4.9.2"
+  }
 }

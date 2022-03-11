@@ -1,105 +1,70 @@
-# vue-i18n-transform
+# vue-i18n-transform README
 
-## 介绍
+This is the README for your extension "vue-i18n-transform". After writing up a brief description, we recommend including the following sections.
 
-vue-i18n-transform 是一款 vue-i18n 批量转换文件，目前仅支持替换中文
+## Features
 
-**vue 文件替换**
+Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
 
-```html
-<!-- 替换前 -->
-<i :class="{ selected: tabactiveName === 1 }" @click="handleTabClick(1)">
-  <span>效果图</span>
-</i>
+For example if there is an image subfolder under your extension project workspace:
 
-<!-- 替换后 -->
-<i :class="{ selected: tabactiveName === 1 }" @click="handleTabClick(1)">
-  <span>{{$t('filename_1')}}</span>
-</i>
-```
+\!\[feature X\]\(images/feature-x.png\)
 
-**js / ts 文件替换**
+> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
-```js
-// 替换前
-export const map = {
-  key: '替换前'
-}
+## Requirements
 
-// 替换后
+If you have any requirements or dependencies, add a section describing those and how to install and configure them.
 
-import i18n from '../locales/index.js'
+## Extension Settings
 
-export const map = {
-  key: i18n.t('filename_2')
-}
-```
+Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
 
-**生成 locales/zh_cn.json 文件**
+For example:
 
-```json
-{
-  "filename_1": "效果图",
-  "filename_2": "替换前"
-}
-```
+This extension contributes the following settings:
 
-**生成 locales/index.js 文件**
+* `myExtension.enable`: enable/disable this extension
+* `myExtension.thing`: set to `blah` to do something
 
-```js
-import VueI18n from 'vue-i18n'
-import Vue from 'vue'
-import zh from './zh_cn.json'
+## Known Issues
 
-Vue.use(VueI18n)
+Calling out known issues can help limit users opening duplicate issues against your extension.
 
-export default new VueI18n({
-  locale: 'zh',
-  messages: {
-    zh
-  }
-})
-```
+## Release Notes
 
-**需手动将 VueI18n 导入入口文件中使用**
+Users appreciate release notes as you update your extension.
 
-```js
-import i18n from './locales/index.js'
+### 1.0.0
 
-new Vue({
-  i18n,
-  router,
-  store
-})
-```
+Initial release of ...
 
-## 安装
+### 1.0.1
 
-```
-npm install vue-i18n-transform -D
-```
+Fixed issue #.
 
-## 转化
+### 1.1.0
 
-```
-npx vue-i18n-transform
-```
+Added features X, Y, and Z.
 
-## 配置
+-----------------------------------------------------------------------------------------------------------
+## Following extension guidelines
 
-以下是默认配置, 当然你也可以在项目文件夹下创建 `vue-i18n-transform.config.js` 文件, 按下面的配置修改你的自定义配置
+Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
 
-```js
-module.exports = {
-  entry: 'src', // 编译入口文件夹,默认是 src
-  outdir: 'src/locales', // i18n 输出文件夹 默认是 src/locales
-  exclude: ['src/locales'], // 不重写的文件夹, 默认是 ['src/locales']
-  extensions: ['.vue', '.js', '.ts'], // 重写的文件类型，默认是 ['.js', '.vue', '.ts']
-  single: false, // 是否为单文件编译, 默认为 false. 如果为 true, 则 entry 需为文件而不是文件夹, 如 entry: 'src/index.vue'
-  filename: 'zh_cn' // 输入的中文 json 文件名,默认为 zh_cn
-}
-```
+* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
 
-## 问题&建议
+## Working with Markdown
 
-如果你有任何问题，可以给我发邮件(zxpscau@163.com)，或者给项目提 [issue](https://github.com/zxpsuper/vue-i18n-transform/issues/new).
+**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
+
+* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
+* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
+* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
+
+### For more information
+
+* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
+* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+
+**Enjoy!**
