@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { errorlog, successlog, warnlog } from './utils'
 import VueI18n, { Config } from './i18nFile'
 const path = require('path')
