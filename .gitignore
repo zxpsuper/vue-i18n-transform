@@ -102,3 +102,9 @@ dist
 
 # TernJS port file
 .tern-port
+
+vue-i18n-transform.config.js
+
+vue-i18n-transform.config.json
+
+test/
