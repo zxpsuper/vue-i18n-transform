@@ -1,6 +1,14 @@
+// 常量
 export default {
   /**配置文件名 vue-i18n-transform.config */
   CustomSettingFileName: 'vue-i18n-transform.config',
   /**package.json */
-  pkgFileName: "package.json"
+  pkgFileName: "package.json",
+  /**注册的命令 */
+  command: {
+    /**打开文件命令 */
+    openFile: 'vue-i18n-transform.openFile',
+    transformFile: 'vue-i18n-transform.transformFile'
+  },
+  langArray: ['vue', 'javascript', 'typescript']
 }

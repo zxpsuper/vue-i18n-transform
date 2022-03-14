@@ -1,29 +1,18 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import hoverI18n from './hoverI18n';
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+import openI18n from './openI18n';
+import transformI18n from './transformI18n';
+
 export function activate(context: vscode.ExtensionContext) {
 	
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "vue-i18n-transform" is now active!');
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('vue-i18n-transform.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from vue-i18n-transform!');
-	});
+	hoverI18n(context); // 文本显示
 
-	hoverI18n(context);
+	openI18n(context); // i18n 文件打开
 
+	transformI18n(context) // i18n 转换
 
-	context.subscriptions.push(disposable);
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() {}

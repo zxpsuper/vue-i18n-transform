@@ -3,6 +3,7 @@ import { provideHover } from './lib/provideHover';
 import * as vscode from 'vscode';
 
 export default function (context: vscode.ExtensionContext) {
+  // 注册提示显示按钮
   context.subscriptions.push(
     registerHoverProvider(
       [
