@@ -1,11 +1,15 @@
 {
   "name": "vue-i18n-transform",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "vue-i18n 批量转换文件",
   "main": "lib/index.js",
+  "scripts": {
+    "dev": "ts-node src/index.ts"
+  },
   "directories": {
     "lib": "lib"
   },
+  
   "bin": {
     "vue-i18n-transform": "lib/index.js"
   },

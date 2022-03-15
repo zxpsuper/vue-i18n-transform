@@ -17,7 +17,9 @@ export default class VueI18n {
   private messagesHash: Record<string, string> = {}
   /**i18n 输出的字典{ key: '值' } */
   private messages: Record<string, string> = {}
+  
   /**入口完整路径 */
+  private entryPath = ''
   private rootPath = ''
 
   /**默认配置 */
@@ -59,11 +61,13 @@ export default class VueI18n {
 
   /**
    * 合并配置
-   * @param config
+   * @param config 配置
+   * @param root 项目根路径
    */
-  mergeConfig(config: Config) {
+  mergeConfig(config: Config, root: string) {
     this.config = Object.assign(this.config, config)
-    this.rootPath = path.join(process.cwd(), this.config.entry)
+    this.rootPath = path.join(root)
+    this.entryPath = path.join(root, this.config.entry)
   }
 
   setMessageItem(key: string, value: string) {
@@ -88,25 +92,42 @@ export default class VueI18n {
     return this.getCurrentKey(chinese, file)
   }
 
-  /**删除 message 中的键值 */
+  /**
+   * 删除 message 中的键值
+   * @param key 
+   */
   deleteMessageKey(key: string) {
     delete this.messages[key]
   }
 
+  /**
+   * 获取当前文件专属 key 前缀
+   * @param file 
+   * @returns 
+   */
   getPreKey(file: string) {
     return `${path
-      .relative(this.rootPath, file)
+      .relative(this.entryPath, file)
       .replace(/[\\/\\\\-]/g, '_')
       .replace(/\..*$/, '')}_`
   }
 
-  /**获取所有文件路径 */
+  /**
+   * 获取当前文件夹下所有文件完整路径
+   * @param dir 当前文件夹
+   * @returns 
+   */
   getAllFiles(dir: string) {
     let results: string[] = []
     fs.readdirSync(dir).forEach((item: string) => {
+
       item = path.join(dir, item)
+
       // 排除文件夹
-      if (this.config.exclude.includes(dir.replace('\\', '/'))) return
+      const excludeList = Array.isArray(this.config.exclude) ? this.config.exclude.map(i => path.join(this.rootPath, i)) : []
+
+      if (excludeList.includes(dir)) return
+
       if (fs.lstatSync(item).isDirectory()) {
         results.push(...this.getAllFiles(item))
       } else {
@@ -121,3 +142,6 @@ export default class VueI18n {
     return results
   }
 }
+
+
+export const VueI18nInstance = new VueI18n()
