@@ -1,8 +1,8 @@
-# vue-i18n-transform README
+# vue-i18n-transform
 
 一款 vue-i18n 转化插件，可以与 npm 插件 （[vue-i18n-transform](https://github.com/zxpsuper/vue-i18n-transform)）同时使用。
 
-![](./GIF.gif)
+![](https://github.com/zxpsuper/vue-i18n-transform/blob/vscode-plugin/GIF.gif?raw=true)
 
 **vue 文件替换**
 
