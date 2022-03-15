@@ -54,7 +54,7 @@ export default class VueI18n {
       1,
       1,
       ...Object.keys(this.messages).map((item) =>
-        Number(item.replace(/^[^\d]+/, ''))
+        Number(item.replace(/^[^\d]+/, '')) || 0
       )
     )
   }

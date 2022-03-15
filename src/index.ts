@@ -1,5 +1,12 @@
 #!/usr/bin/env node
-import { errorlog, successlog, replaceJavaScript, replaceVueScript, replaceVueTemplate, writeIndexFile } from './utils'
+import {
+  errorlog,
+  successlog,
+  replaceJavaScript,
+  replaceVueScript,
+  replaceVueTemplate,
+  writeIndexFile
+} from './utils'
 import { Config, VueI18nInstance } from './i18nFile'
 
 const path = require('path')
@@ -7,7 +14,6 @@ const fs = require('fs-extra')
 // replace 的用法 https://www.cnblogs.com/idiv/p/8442046.html
 
 const configFile = 'vue-i18n-transform.config.js'
-
 
 /**初始化文件 */
 function initFile() {
@@ -44,7 +50,6 @@ function writeI18nFile() {
  * @param file 为当前文件相对路径
  */
 function generateVueFile(file: string) {
-
   // 读取文件
   let content = fs.readFileSync(file, 'utf8')
 
@@ -84,7 +89,7 @@ function generateJsFile(file: string) {
 
   if (!content) {
     errorlog(file + ' no exist!!')
-    return 
+    return
   }
 
   // 判断是否已经引入了 i18n， 若没有引入，则在文件头部引入
@@ -101,7 +106,7 @@ function generateJsFile(file: string) {
       i18n[0] === '.' ? i18n + '/index.js' : './' + i18n + '/index.js'
     }';\n${content}`
   }
-  
+
   content = replaceJavaScript({
     content,
     file,
@@ -119,7 +124,7 @@ function generateJsFile(file: string) {
 
 /**
  * 重写其他文件，目前不支持
- * @param file 
+ * @param file
  */
 function generateOtherFile(file: string) {
   errorlog(`文件 ${file} 不支持转化`)
