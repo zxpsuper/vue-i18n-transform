@@ -11,3 +11,5 @@ tsconfig.json
 vue-i18n-transform.config.js
 
 vue-i18n-transform.config.json
+
+vue-i18n-transform-*.vsix

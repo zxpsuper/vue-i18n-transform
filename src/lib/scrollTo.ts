@@ -3,7 +3,6 @@ import { msg, Selection, executeCommand } from '../utils/vscode'
 import { jsonAST } from '../utils/index' 
 const validator = require('validator')
 
-
 /**
  * 跳行
  * @param line 

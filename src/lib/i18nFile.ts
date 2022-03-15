@@ -10,6 +10,14 @@ export type Config = {
   extensions: string[]
 }
 
+const defaultConfig : Config = {
+  single: false,
+  filename: 'zh_cn',
+  entry: 'src',
+  outdir: 'src/locales',
+  exclude: ['src/locales'],
+  extensions: ['.js', '.vue', '.ts']
+}
 export default class VueI18n {
   /** */
   private index = 1
@@ -21,15 +29,9 @@ export default class VueI18n {
   private rootPath = ''
 
   /**默认配置 */
-  private config: Config = {
-    single: false,
-    filename: 'zh_cn',
-    entry: 'src',
-    outdir: 'src/locales',
-    exclude: ['src/locales'],
-    extensions: ['.js', '.vue', '.ts']
-  }
+  private config = defaultConfig
 
+  static defaultConfig = defaultConfig
   /**获取项目配置 */
   getConfig() {
     return this.config
@@ -122,3 +124,5 @@ export default class VueI18n {
     return results
   }
 }
+
+export const VueI18nInstance = new VueI18n()

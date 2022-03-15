@@ -1,13 +1,11 @@
 import * as vscode from 'vscode'
 import { getEditor, getCustomSetting } from '../utils/index'
-import VueI18n, { Config } from './i18nFile'
-import { errorlog, successlog, warnlog } from '../utils/utils'
+import { Config, VueI18nInstance } from './i18nFile'
+import { errorlog, successlog } from '../utils/utils'
 import { msg } from '../utils/vscode'
 
 const fs = require('fs-extra')
 const path = require('path')
-
-const VueI18nInstance = new VueI18n()
 const configFile = 'vue-i18n-transform.config'
 
 export default function ({

@@ -9,6 +9,7 @@ import {
   open,
   window
 } from './vscode'
+import { VueI18nInstance } from '../lib/i18nFile'
 
 const parse = require('json-to-ast')
 const path = require('path')
@@ -43,7 +44,7 @@ export function getCustomSetting(
     const data =
       fileExist && !forceIgnoreCustomSetting ? fs.readFileSync(customPath) : ''
 
-    if (data === '') return {}
+    if (data === '') return VueI18nInstance.getConfig()
     let customSetting = validator.isJSON(data.toString())
       ? JSON.parse(data.toString())
       : eval(data.toString())

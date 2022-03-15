@@ -108,3 +108,5 @@ vue-i18n-transform.config.js
 vue-i18n-transform.config.json
 
 test/
+
+vue-i18n-transform-*.vsix
