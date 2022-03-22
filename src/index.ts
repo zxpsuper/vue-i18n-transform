@@ -61,6 +61,9 @@ function generateVueFile(file: string) {
     replaceSuccess: ({ currentKey, match }) => {
       VueI18nInstance.setMessageItem(currentKey, match)
       VueI18nInstance.setMessagesHashItem(match, currentKey)
+    },
+    replaceFail: ({ currentKey, match }) => {
+      VueI18nInstance.deleteMessageItem(currentKey, match)
     }
   })
 

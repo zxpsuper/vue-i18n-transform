@@ -7,7 +7,8 @@ type ReplaceProps = {
   content: string
   file: string
   getKey: (match: string, file: string) => string
-  replaceSuccess: (data: { currentKey: string; match: string }) => void
+  replaceSuccess?: (data: { currentKey: string; match: string }) => void
+  replaceFail?: (data: { currentKey: string; match: string }) => void
 }
 
 export function errorlog(message: string) {
@@ -32,7 +33,8 @@ export function replaceVueTemplate({
   content,
   file,
   getKey,
-  replaceSuccess
+  replaceSuccess,
+  replaceFail
 }: ReplaceProps) {
   return content.replace(/<template(.|\n|\r)*template>/gim, (match: string) => {
     return match.replace(
@@ -42,6 +44,7 @@ export function replaceVueTemplate({
         if (prev.match(/src=['"]/)) return _
         match = match.trim()
         let result = ''
+        let replaceStringFail = false // 替换失败
         let currentKey
         if (match.match(/{{[^{}]+}}/)) {
           // 包含变量的中文字符串
@@ -80,9 +83,11 @@ export function replaceVueTemplate({
             // 这里会额外创建一个多余的 message key
             result = prev + match + after
             warnlog(`${file} 存在无法自动替换的文本（${result}），请手动处理`)
+            replaceFail && replaceFail({ currentKey, match })
+            replaceStringFail = true
           }
         }
-        replaceSuccess({ currentKey, match })
+        replaceStringFail === false && replaceSuccess && replaceSuccess({ currentKey, match })
         return result
       }
     )
@@ -168,7 +173,7 @@ export function replaceVueScript({
             result = `this.$t('${currentKey}', [${matchArr.toString()}])`
           }
         }
-        replaceSuccess({ currentKey, match })
+        replaceSuccess && replaceSuccess({ currentKey, match })
         return result
       }
     )
@@ -236,7 +241,7 @@ export function replaceJavaScript({
           result = `i18n.t('${currentKey}', [${matchArr.toString()}])`
         }
       }
-      replaceSuccess({ currentKey, match })
+      replaceSuccess && replaceSuccess({ currentKey, match })
       return result
     }
   )

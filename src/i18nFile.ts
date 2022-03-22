@@ -78,6 +78,15 @@ export default class VueI18n {
     this.messagesHash[key] = value
   }
 
+  deleteMessageItem(key: string, value: string) {
+    if (this.messages[key]) {
+      delete this.messages[key]
+    }
+    if (this.messagesHash[value]) {
+      delete this.messagesHash[value]
+    }
+  }
+
   /**
    * 获取 message 的 key， 如果没有则新建一个
    * @param chinese
