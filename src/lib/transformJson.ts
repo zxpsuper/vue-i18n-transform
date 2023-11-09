@@ -138,8 +138,10 @@ function writeIndexFile(i18nDir: string, config: Config) {
             msg.warn(`${file} 存在无法自动替换的文本（${result}），请手动处理`)
           }
         }
-        VueI18nInstance.setMessageItem(currentKey, match)
-        VueI18nInstance.setMessagesHashItem(match, currentKey)
+        if (result !== (prev + match + after)) {
+          VueI18nInstance.setMessageItem(currentKey, match)
+          VueI18nInstance.setMessagesHashItem(match, currentKey)
+        }
         return result
       }
     )
@@ -241,7 +243,6 @@ function generateVueFile(file: string) {
   let content = fs.readFileSync(file, 'utf8')
   const options = getCustomSetting(file, configFile)
   // template 替换
-  console.log(file, options, file.replace(options.projectDirname, '').slice(1))
   content = replaceVueTemplate(content, file.replace(options.projectDirname, '').slice(1))
 
   // 替换script中的部分

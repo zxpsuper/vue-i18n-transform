@@ -8,6 +8,7 @@ export type Config = {
   outdir: string
   exclude: string[]
   extensions: string[]
+  useChineseKey: boolean
 }
 
 const defaultConfig : Config = {
@@ -16,7 +17,8 @@ const defaultConfig : Config = {
   entry: 'src',
   outdir: 'src/locales',
   exclude: ['src/locales'],
-  extensions: ['.js', '.vue', '.ts']
+  extensions: ['.js', '.vue', '.ts'],
+  useChineseKey: false
 }
 export default class VueI18n {
   /** */
@@ -32,6 +34,7 @@ export default class VueI18n {
   private config = defaultConfig
 
   static defaultConfig = defaultConfig
+
   /**获取项目配置 */
   getConfig() {
     return this.config
@@ -50,11 +53,12 @@ export default class VueI18n {
 
   /**根据 message 初始化 index */
   initIndex() {
+    if (this.config.useChineseKey) return // 使用中文键不需要索引
     this.index = Math.max(
       1,
       1,
       ...Object.keys(this.messages).map((item) =>
-        Number(item.replace(/^[^\d]+/, '') || 0)
+        Number(item.replace(/^[^\d]+/, '') || 0) || 0
       )
     )
   }
@@ -84,7 +88,8 @@ export default class VueI18n {
    */
   getCurrentKey(chinese: string, file: string): string {
     if (this.messagesHash[chinese]) return this.messagesHash[chinese]
-    let key = this.getPreKey(file) + this.index
+    if (this.config.useChineseKey) return chinese
+    let key = this.getPreKey(file) + String(this.index)
     this.index = this.index + 1
     if (this.messages && !this.messages[key]) return key.toLowerCase()
     return this.getCurrentKey(chinese, file)
@@ -99,6 +104,7 @@ export default class VueI18n {
     console.log(this.rootPath, file, path.relative(this.rootPath, file))
     return `${path
       .relative(this.rootPath, file)
+      .replace(/^\.+\\/, '')
       .replace(/[\\/\\\\-]/g, '_')
       .replace(/\..*$/, '')}_`
   }

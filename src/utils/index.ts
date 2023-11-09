@@ -91,24 +91,22 @@ export function getHoverMsg(dirname: string, key: string) {
         const localeObj = flatten(i18nObj)
 
         // 打开文件
-        const name = `[\`${langName}\`](command:${
-          CONST.command.openFile
-        }?${encodeURIComponent(
-          JSON.stringify({
-            fPath: itemPath
-          })
-        )} "Open '${item}'")`
+        const name = `[\`${langName}\`](command:${CONST.command.openFile
+          }?${encodeURIComponent(
+            JSON.stringify({
+              fPath: itemPath
+            })
+          )} "Open '${item}'")`
 
         // 打开文件及当前key行数
         const link = localeObj[key]
-          ? `[${localeObj[key]}](command:${
-              CONST.command.openFile
-            }?${encodeURIComponent(
-              JSON.stringify({
-                fPath: itemPath,
-                key
-              })
-            )} "Show In '${item}'")`
+          ? `[${localeObj[key]}](command:${CONST.command.openFile
+          }?${encodeURIComponent(
+            JSON.stringify({
+              fPath: itemPath,
+              key
+            })
+          )} "Show In '${item}'")`
           : 'undefined'
 
         const current = `* _${name}_&nbsp;&nbsp;${link}\n`
@@ -140,19 +138,19 @@ export function openFileByPath(fPath: string, option?: any) {
 const find = (ast: any, key: string) =>
   ast.children && ast.children.find((m: any) => m.key && m.key.value === key) // return match
 
-  /**
-   * 根据 key 获取其 ast 对象，可以获取到行数据
-   * @param str 
-   * @param keys 
-   * @param wholeMatch 
-   * @returns 
-   */
-export function jsonAST(str: string, keys: string[], wholeMatch = false): any{
+/**
+ * 根据 key 获取其 ast 对象，可以获取到行数据
+ * @param str 
+ * @param keys 
+ * @param wholeMatch 
+ * @returns 
+ */
+export function jsonAST(str: string, keys: string[], wholeMatch = false): any {
   const ast = parse(str)
   if (wholeMatch) {
     // 针对 一级 key 返回对应的对象
-		return find(ast, keys[0]);
-	}
+    return find(ast, keys[0]);
+  }
   // 多级 key 则遍历寻找到该 key
   let result = ast
   keys.forEach((v) => {
@@ -179,9 +177,9 @@ export function jsonAST(str: string, keys: string[], wholeMatch = false): any{
  * @returns 
  */
 export const getEditor = (editor: vscode.TextEditor | undefined) => {
-	let currentEditor = editor || window.activeTextEditor;
-	const stopFlag =
-		!currentEditor || !CONST.langArray.includes(currentEditor.document.languageId);
-	if (stopFlag) return false;
-	return currentEditor;
+  let currentEditor = editor || window.activeTextEditor;
+  const stopFlag =
+    !currentEditor || !CONST.langArray.includes(currentEditor.document.languageId);
+  if (stopFlag) return false;
+  return currentEditor;
 };

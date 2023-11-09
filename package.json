@@ -2,7 +2,7 @@
   "name": "vue-i18n-transform",
   "displayName": "vue-i18n-transform",
   "description": "",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "engines": {
     "vscode": "^1.65.0"
   },
@@ -23,6 +23,10 @@
       {
         "command": "vue-i18n-transform.transformFile",
         "title": "transformFile i18n"
+      },
+      {
+        "command": "vue-i18n-transform.recoverFile",
+        "title": "recoverFile i18n"
       }
     ],
     "menus": {
@@ -40,6 +44,21 @@
         {
           "when": "editorFocus && resourceLangId == typescript",
           "command": "vue-i18n-transform.transformFile",
+          "group": "vue-i18n-transform"
+        },
+        {
+          "when": "editorFocus && resourceLangId == vue",
+          "command": "vue-i18n-transform.recoverFile",
+          "group": "vue-i18n-transform"
+        },
+        {
+          "when": "editorFocus && resourceLangId == javascript",
+          "command": "vue-i18n-transform.recoverFile",
+          "group": "vue-i18n-transform"
+        },
+        {
+          "when": "editorFocus && resourceLangId == typescript",
+          "command": "vue-i18n-transform.recoverFile",
           "group": "vue-i18n-transform"
         }
       ]

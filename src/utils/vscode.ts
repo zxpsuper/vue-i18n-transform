@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+
 /**悬浮提示 */
 export const registerHoverProvider = vscode.languages.registerHoverProvider;
 export const hover = vscode.Hover;
