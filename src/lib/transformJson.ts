@@ -7,7 +7,8 @@ import { msg } from '../utils/vscode'
 const fs = require('fs-extra')
 const path = require('path')
 const configFile = 'vue-i18n-transform.config'
-
+// (?!\1) 指 非 ['"`]
+const jsChineseRegExp = /(['"`])(((?!\1).)*[\u4e00-\u9fa5]+((?!\1).)*)\1/gim
 export default function ({
   editor,
   context
@@ -91,11 +92,19 @@ function writeIndexFile(i18nDir: string, config: Config) {
  */
  function replaceVueTemplate(content: string, file: string) {
   return content.replace(/<template(.|\n|\r)*template>/gim, (match: string) => {
+    const originMatch = match
     return match.replace(
       /((\w+-){0,}\w+=['"]|>|'|")([^'"<>]*[\u4e00-\u9fa5]+[^'"<>]*)(['"<])/gim,
-      (_, prev: string, __, match: string, after: string) => {
+      (_, prev: string, __, match: string, after: string, offset: number) => {
         // 针对一些资源中含有中文名时，不做替换
         if (prev.match(/src=['"]/)) return _
+        // 针对使用中文键的变量不做处理
+        if (VueI18nInstance.getConfig().useChineseKey) {
+          const chineseTransformKey = originMatch.slice(offset - 3, offset + match.length + 3)
+          if (/^\$t\(.+\)/.test(chineseTransformKey)) {
+            return _
+          }
+        }
         match = match.trim()
         let result = ''
         let currentKey
@@ -191,11 +200,17 @@ function replaceVueScript(content: string, file: string) {
       comments[commentsKey] = match
       return commentsKey
     })
-
+    const originMatch = match
     match = match.replace(
-      // (?!\1) 指 非 ['"`]
-      /(['"`])(((?!\1).)*[\u4e00-\u9fa5]+((?!\1).)*)\1/gim,
-      (_, prev, match) => {
+      jsChineseRegExp,
+      (_, prev, match, __, ___, offset) => {
+        // 针对使用中文键的变量不做处理
+        if (VueI18nInstance.getConfig().useChineseKey) {
+          const chineseTransformKey = originMatch.slice(offset - 3, offset + match.length + 3)
+          if (/^\$t\(.+\)/.test(chineseTransformKey)) {
+            return _
+          }
+        }
         match = match.trim()
         let currentKey
         let result = ''
@@ -297,9 +312,17 @@ function generateJsFile(file: string) {
       return commentsKey
     }
   )
+  const originMatch = content
   content = content.replace(
-    /(['"`])(((?!\1).)*[\u4e00-\u9fa5]+((?!\1).)*)\1/gim,
-    (_: any, prev: string, match: string) => {
+    jsChineseRegExp,
+    (_: any, prev: string, match: string, __: any, ___: any, offset: number) => {
+      // 针对使用中文键的变量不做处理
+      if (VueI18nInstance.getConfig().useChineseKey) {
+        const chineseTransformKey = originMatch.slice(offset - 3, offset + match.length + 3)
+        if (/^\.t\(.+\)/.test(chineseTransformKey)) {
+          return _
+        }
+      }
       match = match.trim()
       let currentKey
       let result = ''

@@ -2,7 +2,7 @@
   "name": "vue-i18n-transform",
   "displayName": "vue-i18n-transform",
   "description": "",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "engines": {
     "vscode": "^1.65.0"
   },
