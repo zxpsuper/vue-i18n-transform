@@ -86,7 +86,14 @@ export function getHoverMsg(dirname: string, key: string) {
         const itemPath = path.join(dirname, item)
         const data = fs.readFileSync(itemPath)
         const langName = path.basename(item, '.json')
-        const i18nObj = !!data.toString() ? JSON.parse(data.toString()) : {}
+        let i18nObj
+        try {
+          i18nObj = !!data.toString() ? JSON.parse(data.toString()) : {}
+        }catch(err) {
+          console.log(err)
+          showErrorMessage(`${langName}.json文件解析失败，请检查json格式是否错误或者文件编码格式是否为utf-8`)
+          i18nObj = {}
+        }
         // 展开
         const localeObj = flatten(i18nObj)
 
