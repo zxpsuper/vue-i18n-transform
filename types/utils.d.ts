@@ -1,9 +1,13 @@
 import { Config } from './i18nFile';
-declare type ReplaceProps = {
+type ReplaceProps = {
     content: string;
     file: string;
     getKey: (match: string, file: string) => string;
-    replaceSuccess: (data: {
+    replaceSuccess?: (data: {
+        currentKey: string;
+        match: string;
+    }) => void;
+    replaceFail?: (data: {
         currentKey: string;
         match: string;
     }) => void;
@@ -17,7 +21,7 @@ export declare function warnlog(message: string): void;
  * @param file 文件路径
  * @returns
  */
-export declare function replaceVueTemplate({ content, file, getKey, replaceSuccess }: ReplaceProps): string;
+export declare function replaceVueTemplate({ content, file, getKey, replaceSuccess, replaceFail }: ReplaceProps): string;
 /**
  * 替换 vue 中的 script 中文
  * @param content 文本

@@ -8,7 +8,19 @@ export type Config = {
   outdir: string
   exclude: string[]
   extensions: string[]
+  useChineseKey: boolean
 }
+
+const defaultConfig : Config = {
+  single: false,
+  filename: 'zh_cn',
+  entry: 'src',
+  outdir: 'src/locales',
+  exclude: ['src/locales'],
+  extensions: ['.js', '.vue', '.ts'],
+  useChineseKey: false
+}
+
 
 export default class VueI18n {
   /** */
@@ -17,20 +29,13 @@ export default class VueI18n {
   private messagesHash: Record<string, string> = {}
   /**i18n 输出的字典{ key: '值' } */
   private messages: Record<string, string> = {}
-  
   /**入口完整路径 */
-  private entryPath = ''
   private rootPath = ''
 
   /**默认配置 */
-  private config: Config = {
-    single: false,
-    filename: 'zh_cn',
-    entry: 'src',
-    outdir: 'src/locales',
-    exclude: ['src/locales'],
-    extensions: ['.js', '.vue', '.ts']
-  }
+  private config = defaultConfig
+
+  static defaultConfig = defaultConfig
 
   /**获取项目配置 */
   getConfig() {
@@ -50,24 +55,23 @@ export default class VueI18n {
 
   /**根据 message 初始化 index */
   initIndex() {
+    if (this.config.useChineseKey) return // 使用中文键不需要索引
     this.index = Math.max(
       1,
       1,
       ...Object.keys(this.messages).map((item) =>
-        Number(item.replace(/^[^\d]+/, '')) || 0
+        Number(item.replace(/^[^\d]+/, '') || 0) || 0
       )
     )
   }
 
   /**
    * 合并配置
-   * @param config 配置
-   * @param root 项目根路径
+   * @param config
    */
-  mergeConfig(config: Config, root: string) {
+  mergeConfig(config: Config) {
     this.config = Object.assign(this.config, config)
-    this.rootPath = path.join(root)
-    this.entryPath = path.join(root, this.config.entry)
+    this.rootPath = path.join(this.config.entry)
   }
 
   setMessageItem(key: string, value: string) {
@@ -78,15 +82,6 @@ export default class VueI18n {
     this.messagesHash[key] = value
   }
 
-  deleteMessageItem(key: string, value: string) {
-    if (this.messages[key]) {
-      delete this.messages[key]
-    }
-    if (this.messagesHash[value]) {
-      delete this.messagesHash[value]
-    }
-  }
-
   /**
    * 获取 message 的 key， 如果没有则新建一个
    * @param chinese
@@ -95,48 +90,33 @@ export default class VueI18n {
    */
   getCurrentKey(chinese: string, file: string): string {
     if (this.messagesHash[chinese]) return this.messagesHash[chinese]
-    let key = this.getPreKey(file) + this.index
+    if (this.config.useChineseKey) return chinese
+    let key = this.getPreKey(file) + String(this.index)
     this.index = this.index + 1
     if (this.messages && !this.messages[key]) return key.toLowerCase()
     return this.getCurrentKey(chinese, file)
   }
 
-  /**
-   * 删除 message 中的键值
-   * @param key 
-   */
+  /**删除 message 中的键值 */
   deleteMessageKey(key: string) {
     delete this.messages[key]
   }
 
-  /**
-   * 获取当前文件专属 key 前缀
-   * @param file 
-   * @returns 
-   */
   getPreKey(file: string) {
     return `${path
-      .relative(this.entryPath, file)
+      .relative(this.rootPath, file)
+      .replace(/^\.+\\/, '')
       .replace(/[\\/\\\\-]/g, '_')
       .replace(/\..*$/, '')}_`
   }
 
-  /**
-   * 获取当前文件夹下所有文件完整路径
-   * @param dir 当前文件夹
-   * @returns 
-   */
+  /**获取所有文件路径 */
   getAllFiles(dir: string) {
     let results: string[] = []
     fs.readdirSync(dir).forEach((item: string) => {
-
       item = path.join(dir, item)
-
       // 排除文件夹
-      const excludeList = Array.isArray(this.config.exclude) ? this.config.exclude.map(i => path.join(this.rootPath, i)) : []
-
-      if (excludeList.includes(dir)) return
-
+      if (this.config.exclude.includes(dir.replace('\\', '/'))) return
       if (fs.lstatSync(item).isDirectory()) {
         results.push(...this.getAllFiles(item))
       } else {
@@ -151,6 +131,5 @@ export default class VueI18n {
     return results
   }
 }
-
 
 export const VueI18nInstance = new VueI18n()

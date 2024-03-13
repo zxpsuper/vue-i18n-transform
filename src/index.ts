@@ -62,8 +62,8 @@ function generateVueFile(file: string) {
       VueI18nInstance.setMessageItem(currentKey, match)
       VueI18nInstance.setMessagesHashItem(match, currentKey)
     },
-    replaceFail: ({ currentKey, match }) => {
-      VueI18nInstance.deleteMessageItem(currentKey, match)
+    replaceFail: ({ currentKey }) => {
+      VueI18nInstance.deleteMessageKey(currentKey)
     }
   })
 
@@ -143,7 +143,7 @@ function generate() {
   if (fs.existsSync(configPath)) {
     config = require(configPath)
     if (typeof config === 'object' && config.toString() === '[object Object]') {
-      VueI18nInstance.mergeConfig(config, process.cwd())
+      VueI18nInstance.mergeConfig(config)
       config = VueI18nInstance.getConfig()
     } else {
       return errorlog(configFile + ' 配置文件格式错误')

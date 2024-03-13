@@ -1,4 +1,4 @@
-import { Config } from './i18nFile'
+import { Config, VueI18nInstance } from './i18nFile'
 const chalk = require('chalk')
 const path = require('path')
 const fs = require('fs-extra')
@@ -37,11 +37,19 @@ export function replaceVueTemplate({
   replaceFail
 }: ReplaceProps) {
   return content.replace(/<template(.|\n|\r)*template>/gim, (match: string) => {
+    const originMatch = match
     return match.replace(
       /((\w+-){0,}\w+=['"]|>|'|")([^'"<>]*[\u4e00-\u9fa5]+[^'"<>]*)(['"<])/gim,
-      (_, prev: string, __, match: string, after: string) => {
+      (_, prev: string, __, match: string, after: string, offset: number) => {
         // 针对一些资源中含有中文名时，不做替换
         if (prev.match(/src=['"]/)) return _
+        // 针对使用中文键的变量不做处理
+        if (VueI18nInstance.getConfig().useChineseKey) {
+          const chineseTransformKey = originMatch.slice(offset - 3, offset + match.length + 3)
+          if (/^\$t\(.+\)/.test(chineseTransformKey)) {
+            return _
+          }
+        }
         match = match.trim()
         let result = ''
         let replaceStringFail = false // 替换失败
@@ -142,11 +150,18 @@ export function replaceVueScript({
       comments[commentsKey] = match
       return commentsKey
     })
-
+    const originMatch = match
     match = match.replace(
       // (?!\1) 指 非 ['"`]
       /(['"`])(((?!\1).)*[\u4e00-\u9fa5]+((?!\1).)*)\1/gim,
-      (_, prev, match) => {
+      (_, prev, match, __, ___, offset) => {
+        // 针对使用中文键的变量不做处理
+        if (VueI18nInstance.getConfig().useChineseKey) {
+          const chineseTransformKey = originMatch.slice(offset - 3, offset + match.length + 3)
+          if (/^\$t\(.+\)/.test(chineseTransformKey)) {
+            return _
+          }
+        }
         match = match.trim()
         let currentKey
         let result = ''
@@ -216,9 +231,18 @@ export function replaceJavaScript({
       return commentsKey
     }
   )
+
+  const originMatch = content
   content = content.replace(
     /(['"`])(((?!\1).)*[\u4e00-\u9fa5]+((?!\1).)*)\1/gim,
-    (_: any, prev: string, match: string) => {
+    (_: any, prev: string, match: string, __: any, ___: any, offset: number) => {
+      // 针对使用中文键的变量不做处理
+      if (VueI18nInstance.getConfig().useChineseKey) {
+        const chineseTransformKey = originMatch.slice(offset - 3, offset + match.length + 3)
+        if (/^\.t\(.+\)/.test(chineseTransformKey)) {
+          return _
+        }
+      }
       match = match.trim()
       let currentKey
       let result = ''
@@ -266,7 +290,7 @@ export function writeIndexFile(i18nDir: string, config: Config) {
   fs.writeFileSync(
     file,
     `import VueI18n from 'vue-i18n'\nimport Vue from 'vue'\nimport zh from './${config.filename}.json'\n\n` +
-      `Vue.use(VueI18n)\n\nexport default new VueI18n({\n\tlocale: 'zh',\n\tmessages: {\n\t\tzh \n\t}\n})\n`,
+    `Vue.use(VueI18n)\n\nexport default new VueI18n({\n\tlocale: 'zh',\n\tmessages: {\n\t\tzh \n\t}\n})\n`,
     'utf8'
   )
 }
