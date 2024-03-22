@@ -2,20 +2,24 @@
 import {
   errorlog,
   successlog,
-  replaceJavaScript,
-  replaceVueScript,
-  replaceVueTemplate,
   writeIndexFile
 } from './utils'
-import { Config, VueI18nInstance } from './i18nFile'
+import { Config, VueI18nInstance } from './core/i18nFile'
+import _const from './core/const'
+import { replaceVueScript, replaceJavaScriptFile } from './core/transform'
+import replaceVueTemplate from './core/replaceVueTemplate'
 
 const path = require('path')
 const fs = require('fs-extra')
 // replace 的用法 https://www.cnblogs.com/idiv/p/8442046.html
 
-const configFile = 'vue-i18n-transform.config.js'
+const configFile = _const.CustomSettingFileName + '.js'
 
-/**初始化文件 */
+export const message = {
+  error: errorlog,
+  successlog: successlog
+}
+/**初始化文件,写入index.js文件 */
 function initFile() {
   const config = VueI18nInstance.getConfig()
   const i18nDir = path.join(process.cwd(), config.outdir)
@@ -37,7 +41,7 @@ function initFile() {
 }
 
 /**写入 i18n json 文件 */
-function writeI18nFile() {
+function writeI18nJSONFile() {
   const config = VueI18nInstance.getConfig()
   const message = VueI18nInstance.getMessage()
   const outdir = path.join(process.cwd(), config.outdir || '')
@@ -54,29 +58,10 @@ function generateVueFile(file: string) {
   let content = fs.readFileSync(file, 'utf8')
 
   // template 替换
-  content = replaceVueTemplate({
-    content,
-    file,
-    getKey: VueI18nInstance.getCurrentKey.bind(VueI18nInstance),
-    replaceSuccess: ({ currentKey, match }) => {
-      VueI18nInstance.setMessageItem(currentKey, match)
-      VueI18nInstance.setMessagesHashItem(match, currentKey)
-    },
-    replaceFail: ({ currentKey }) => {
-      VueI18nInstance.deleteMessageKey(currentKey)
-    }
-  })
+  content = replaceVueTemplate(content, file, VueI18nInstance, message)
 
   // 替换script中的部分
-  content = replaceVueScript({
-    content,
-    file,
-    getKey: VueI18nInstance.getCurrentKey.bind(VueI18nInstance),
-    replaceSuccess: ({ currentKey, match }) => {
-      VueI18nInstance.setMessageItem(currentKey, match)
-      VueI18nInstance.setMessagesHashItem(match, currentKey)
-    }
-  })
+  content = replaceVueScript(content, file, VueI18nInstance, message)
 
   successlog(`${file} 成功写入`)
 
@@ -89,39 +74,12 @@ function generateVueFile(file: string) {
  */
 function generateJsFile(file: string) {
   let content = fs.readFileSync(file, 'utf8')
-
   if (!content) {
     errorlog(file + ' no exist!!')
     return
   }
-
-  // 判断是否已经引入了 i18n， 若没有引入，则在文件头部引入
-  let i18nMatch = content.match(
-    /(import[\s\t]+i18n[\s\t]+from.+['"].+['"];?)|((let|var|const)[\s\t]+i18n[\s\t]+\=[\s\t]+require\(['"].+['"]\)[\s\t]*;?)/m
-  )
-
-  if (!i18nMatch) {
-    const i18n = path
-      .relative(path.dirname(file), VueI18nInstance.getConfig().outdir)
-      .replace(/\\/g, '/')
-
-    content = `import i18n from '${
-      i18n[0] === '.' ? i18n + '/index.js' : './' + i18n + '/index.js'
-    }';\n${content}`
-  }
-
-  content = replaceJavaScript({
-    content,
-    file,
-    getKey: VueI18nInstance.getCurrentKey.bind(VueI18nInstance),
-    replaceSuccess: ({ currentKey, match }) => {
-      VueI18nInstance.setMessageItem(currentKey, match)
-      VueI18nInstance.setMessagesHashItem(match, currentKey)
-    }
-  })
-
+  content = replaceJavaScriptFile(content, file, VueI18nInstance, message)
   successlog(`${file} 成功写入`)
-
   fs.writeFileSync(file, content, 'utf-8')
 }
 
@@ -137,27 +95,27 @@ function generateOtherFile(file: string) {
 function generate() {
   /**项目配置 */
   let config: Config | undefined
-  /**配置文件完整路径 */
+  /**配置文件完整路径 */ // 'E:\\github\\vue-i18n-transform\\vue-i18n-transform.config.js'
   const configPath = path.join(process.cwd(), configFile)
+
   // 如果存在配置文件
   if (fs.existsSync(configPath)) {
     config = require(configPath)
     if (typeof config === 'object' && config.toString() === '[object Object]') {
-      VueI18nInstance.mergeConfig(config)
+      VueI18nInstance.mergeConfig({...config, projectDirname: process.cwd()})
       config = VueI18nInstance.getConfig()
     } else {
       return errorlog(configFile + ' 配置文件格式错误')
     }
   }
 
-  if (config === undefined) {
+  if (!config) {
     return errorlog(configFile + ' 配置文件格式错误')
   }
-
   initFile()
   // 文件的绝对路径
   let files: string[] = []
-  if (config.single === false) {
+  if (config?.single === false) {
     files = VueI18nInstance.getAllFiles(path.join(process.cwd(), config.entry))
   } else {
     files = [path.join(process.cwd(), config.entry)]
@@ -165,8 +123,8 @@ function generate() {
 
   const i18nFile = path.join(
     process.cwd(),
-    config?.outdir,
-    `${config.filename}.js`
+    config.outdir,
+    `${config.filename}.json`
   )
 
   files.forEach((file) => {
@@ -180,7 +138,8 @@ function generate() {
     }
   })
 
-  writeI18nFile()
+  writeI18nJSONFile()
 }
 
 generate()
+

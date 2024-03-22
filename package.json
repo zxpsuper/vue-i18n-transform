@@ -4,23 +4,34 @@
   "description": "vue-i18n 批量转换文件",
   "main": "lib/main.js",
   "scripts": {
-    "dev": "ts-node src/index.ts"
+    "test": "jest --coverage",
+    "test:watch": "jest test/replaceJavaScript.test.ts --watch --coverage",
+    "dev": "ts-node ./src/index.ts"
   },
   "directories": {
     "lib": "lib"
   },
-  
   "bin": {
     "vue-i18n-transform": "lib/index.js"
   },
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "ts-jest"
+    },
+    "testEnvironment": "node",
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$"
+  },
   "dependencies": {
     "chalk": "^4.1.2",
-    "fs-extra": "^10.0.1"
+    "fs-extra": "^10.1.0"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.12",
     "@types/node": "^17.0.21",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
     "ts-node": "^10.7.0",
-    "typescript": "^4.6.2"
+    "typescript": "^4.9.5"
   },
   "repository": {
     "type": "git",

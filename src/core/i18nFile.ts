@@ -9,6 +9,7 @@ export type Config = {
   exclude: string[]
   extensions: string[]
   useChineseKey: boolean
+  projectDirname:　string
 }
 
 const defaultConfig : Config = {
@@ -18,23 +19,23 @@ const defaultConfig : Config = {
   outdir: 'src/locales',
   exclude: ['src/locales'],
   extensions: ['.js', '.vue', '.ts'],
-  useChineseKey: false
+  useChineseKey: false,
+  projectDirname: ''
 }
 
 
 export default class VueI18n {
-  /** */
+  /**起始索引 */
   private index = 1
   /**中文 key 哈希字典 */
   private messagesHash: Record<string, string> = {}
   /**i18n 输出的字典{ key: '值' } */
   private messages: Record<string, string> = {}
-  /**入口完整路径 */
+  /**入口路径 */
   private rootPath = ''
 
   /**默认配置 */
   private config = defaultConfig
-
   static defaultConfig = defaultConfig
 
   /**获取项目配置 */
@@ -53,32 +54,38 @@ export default class VueI18n {
     return this.messages
   }
 
+  getHashMessage() {
+    return this.messagesHash
+  }
+
   /**根据 message 初始化 index */
   initIndex() {
     if (this.config.useChineseKey) return // 使用中文键不需要索引
     this.index = Math.max(
-      1,
-      1,
+      0,
       ...Object.keys(this.messages).map((item) =>
         Number(item.replace(/^[^\d]+/, '') || 0) || 0
       )
     )
+    this.index++
   }
 
   /**
    * 合并配置
    * @param config
    */
-  mergeConfig(config: Config) {
+  mergeConfig(config: any) {
     this.config = Object.assign(this.config, config)
+    // path.join 的作用是把 ./test/vue.js 和 test/vue.js 统一转化成 test/vue.js
     this.rootPath = path.join(this.config.entry)
   }
 
   setMessageItem(key: string, value: string) {
     this.messages[key] = value
+    this.setMessagesHashItem(value, key)
   }
 
-  setMessagesHashItem(key: string, value: string) {
+  private setMessagesHashItem(key: string, value: string) {
     this.messagesHash[key] = value
   }
 
@@ -93,16 +100,16 @@ export default class VueI18n {
     if (this.config.useChineseKey) return chinese
     let key = this.getPreKey(file) + String(this.index)
     this.index = this.index + 1
-    if (this.messages && !this.messages[key]) return key.toLowerCase()
-    return this.getCurrentKey(chinese, file)
+    return key.toLowerCase()
   }
 
   /**删除 message 中的键值 */
   deleteMessageKey(key: string) {
+    delete this.messagesHash[this.messages[key]]
     delete this.messages[key]
   }
 
-  getPreKey(file: string) {
+  private getPreKey(file: string) {
     return `${path
       .relative(this.rootPath, file)
       .replace(/^\.+\\/, '')
