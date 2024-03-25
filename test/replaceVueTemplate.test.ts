@@ -140,7 +140,7 @@ describe('replaceVueTemplate 测试', () => {
       message
     )
     expect(result.replace(/[\n\r]+|\s{2,}/gim, '')).toBe(
-      `<template><div>{{$t("test_1", [name])}}</div></template>`
+      `<template><div>{{$t('test_1', [name])}}</div></template>`
     )
     expect(VueI18nInstance.getMessage().test_1).toBe(`{0}名字`)
   })
@@ -157,7 +157,7 @@ describe('replaceVueTemplate 测试', () => {
       message
     )
     expect(result.replace(/[\n\r]+|\s{2,}/gim, '')).toBe(
-      `<template><div>{{$t("test_1", [name])}}</div></template>`
+      `<template><div>{{$t('test_1', [name])}}</div></template>`
     )
     expect(VueI18nInstance.getMessage().test_1).toBe(`名字{0}`)
   })
@@ -174,7 +174,7 @@ describe('replaceVueTemplate 测试', () => {
       message
     )
     expect(result.replace(/[\n\r]+|\s{2,}/gim, '')).toBe(
-      `<template><div>{{$t("test_1", [name])}}</div></template>`
+      `<template><div>{{$t('test_1', [name])}}</div></template>`
     )
     expect(VueI18nInstance.getMessage().test_1).toBe(`名字{0}年龄`)
   })
