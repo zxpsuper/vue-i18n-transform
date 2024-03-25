@@ -1,6 +1,6 @@
 import CONST from './const'
 import type { Message } from './transform'
-import type VueI18n  from './i18nFile'
+import type VueI18n from './i18nFile'
 
 const path = require('path')
 const fs = require('fs')
@@ -16,21 +16,24 @@ const validator = require('validator')
 export function getCustomSetting(
   fsPath: string,
   customConfigFileName: string,
-  VueI18nInstance: VueI18n, 
+  VueI18nInstance: VueI18n,
   msg?: Message,
   forceIgnoreCustomSetting = false
 ): any {
   const dirName = path.dirname(fsPath)
-
-  if (fs.existsSync(path.join(dirName, CONST.pkgFileName))) {
+  const root = path.parse(dirName).root
+  if (root === dirName) {
+    return VueI18nInstance.getConfig()
+  } else if (fs.existsSync(path.join(dirName, CONST.pkgFileName))) {
     const customPath = path.join(dirName, customConfigFileName + '.js')
     const customJSONPath = path.join(dirName, customConfigFileName + '.json')
     const fileExist = fs.existsSync(customPath) || fs.existsSync(customJSONPath)
 
-    const data =
-      fileExist && !forceIgnoreCustomSetting ? fs.readFileSync(customPath) : ''
+    const data = fileExist && !forceIgnoreCustomSetting ? fs.readFileSync(customPath) : ''
 
-    if (data === '') return VueI18nInstance.getConfig()
+    if (data === '') {
+      return VueI18nInstance.getConfig()
+    }
     let customSetting = validator.isJSON(data.toString())
       ? JSON.parse(data.toString())
       : eval(data.toString())
@@ -58,4 +61,3 @@ export function getCustomSetting(
     )
   }
 }
-

@@ -1,24 +1,22 @@
-
 import type VueI18n from './i18nFile'
 import type { Message } from './transform'
 
 // (?!\1) 指 非 ['"`]
 const jsChineseRegExp = /(['"`])(((?!\1).)*[\u4e00-\u9fa5]+((?!\1).)*)\1/gim
 
-export default function replaceJavaScript(content: string, file: string, VueI18nInstance: VueI18n, msg: Message) {
+export default function replaceJavaScript(
+  content: string,
+  file: string,
+  VueI18nInstance: VueI18n,
+  msg: Message
+) {
   //替换注释部分
   let comments: Record<string, string> = {}
   let commentsIndex = 0
   content = content.replace(
     // /(\/\*([^\*\/]*|.|\n|\r)*\*\/)|(\/\/.*)/gim,
     /(\/\*(?:(?!\*\/).|[\n\r])*\*\/)|(\/\/.*)/gim,
-    (
-      match: string,
-      _p1: any,
-      _p2: any,
-      offset: number,
-      str: string
-    ) => {
+    (match: string, _p1: any, _p2: any, offset: number, str: string) => {
       //排除掉url协议部分,貌似不排除也不影响
       if (offset > 0 && str[offset - 1] === ':') {
         return match
@@ -30,24 +28,18 @@ export default function replaceJavaScript(content: string, file: string, VueI18n
   )
 
   // 替换掉原本就有的i18n.t('****')
-  content = content.replace(
-    /i18n\.t\(((?!\)).)*\)/gim,
-    (match: string) => {
-      let commentsKey = `/*comment_${commentsIndex++}*/`
-      comments[commentsKey] = match
-      return commentsKey
-    }
-  )
+  content = content.replace(/i18n\.t\(((?!\)).)*\)/gim, (match: string) => {
+    let commentsKey = `/*comment_${commentsIndex++}*/`
+    comments[commentsKey] = match
+    return commentsKey
+  })
 
   // 替换掉console.log()
-  content = content.replace(
-    /console\.log\([^\)]+\)/gim,
-    (match: string) => {
-      let commentsKey = `/*comment_${commentsIndex++}*/`
-      comments[commentsKey] = match
-      return commentsKey
-    }
-  )
+  content = content.replace(/console\.log\([^\)]+\)/gim, (match: string) => {
+    let commentsKey = `/*comment_${commentsIndex++}*/`
+    comments[commentsKey] = match
+    return commentsKey
+  })
 
   // map里的中文键值不应该被替换
   // 所以先替换含有中文键值,后面再换回来，作用和注释一样，共用一个 comments
@@ -58,14 +50,11 @@ export default function replaceJavaScript(content: string, file: string, VueI18n
   })
 
   // 替换（可能含有中文的 require）, 作用和注释一样，共用一个 comments
-  content = content.replace(
-    /require\(((?!\)).)*\)/gim,
-    (match: string) => {
-      let commentsKey = `/*comment_${commentsIndex++}*/`
-      comments[commentsKey] = match
-      return commentsKey
-    }
-  )
+  content = content.replace(/require\(((?!\)).)*\)/gim, (match: string) => {
+    let commentsKey = `/*comment_${commentsIndex++}*/`
+    comments[commentsKey] = match
+    return commentsKey
+  })
 
   content = content.replace(
     jsChineseRegExp,

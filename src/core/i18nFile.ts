@@ -9,10 +9,10 @@ export type Config = {
   exclude: string[]
   extensions: string[]
   useChineseKey: boolean
-  projectDirname:　string
+  projectDirname: string
 }
 
-const defaultConfig : Config = {
+const defaultConfig: Config = {
   single: false,
   filename: 'zh_cn',
   entry: 'src',
@@ -22,7 +22,6 @@ const defaultConfig : Config = {
   useChineseKey: false,
   projectDirname: ''
 }
-
 
 export default class VueI18n {
   /**起始索引 */
@@ -60,12 +59,12 @@ export default class VueI18n {
 
   /**根据 message 初始化 index */
   initIndex() {
-    if (this.config.useChineseKey) return // 使用中文键不需要索引
+    if (this.config.useChineseKey) {
+      return
+    } // 使用中文键不需要索引
     this.index = Math.max(
       0,
-      ...Object.keys(this.messages).map((item) =>
-        Number(item.replace(/^[^\d]+/, '') || 0) || 0
-      )
+      ...Object.keys(this.messages).map((item) => Number(item.replace(/^[^\d]+/, '') || 0) || 0)
     )
     this.index++
   }
@@ -77,7 +76,7 @@ export default class VueI18n {
   mergeConfig(config: any) {
     this.config = Object.assign(this.config, config)
     // path.join 的作用是把 ./test/vue.js 和 test/vue.js 统一转化成 test/vue.js
-    this.rootPath = path.join(this.config.entry)
+    this.rootPath = path.join(this.config.projectDirname, this.config.entry)
   }
 
   setMessageItem(key: string, value: string) {
@@ -96,8 +95,12 @@ export default class VueI18n {
    * @returns
    */
   getCurrentKey(chinese: string, file: string): string {
-    if (this.messagesHash[chinese]) return this.messagesHash[chinese]
-    if (this.config.useChineseKey) return chinese
+    if (this.messagesHash[chinese]) {
+      return this.messagesHash[chinese]
+    }
+    if (this.config.useChineseKey) {
+      return chinese
+    }
     let key = this.getPreKey(file) + String(this.index)
     this.index = this.index + 1
     return key.toLowerCase()
@@ -107,6 +110,15 @@ export default class VueI18n {
   deleteMessageKey(key: string) {
     delete this.messagesHash[this.messages[key]]
     delete this.messages[key]
+  }
+
+  /**
+   * 删除所有数据
+   */
+  deleteMessages() {
+    this.messagesHash = {}
+    this.messages = {}
+    this.index = 1
   }
 
   private getPreKey(file: string) {
@@ -123,13 +135,13 @@ export default class VueI18n {
     fs.readdirSync(dir).forEach((item: string) => {
       item = path.join(dir, item)
       // 排除文件夹
-      if (this.config.exclude.includes(dir.replace('\\', '/'))) return
+      if (this.config.exclude.includes(dir.replace('\\', '/'))) {
+        return
+      }
       if (fs.lstatSync(item).isDirectory()) {
         results.push(...this.getAllFiles(item))
       } else {
-        if (
-          this.config.extensions.indexOf(path.extname(item).toLowerCase()) > -1
-        ) {
+        if (this.config.extensions.indexOf(path.extname(item).toLowerCase()) > -1) {
           results.push(item)
         }
       }
