@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 import { hover } from '../utils/vscode'
-import CONST from '../utils/const'
+import CONST from '../core/const'
 import { getCustomSetting, getHoverMsg } from '../utils/index'
 import { dollarTRegexp } from '../utils/regexp'
 
@@ -21,15 +21,9 @@ export function provideHover(
   // const lineText = document.lineAt(lineNum).text; // 行文本
 
   const { fsPath } = document.uri
-  const { outdir, projectDirname } = getCustomSetting(
-    fsPath,
-    CONST.CustomSettingFileName
-  )
+  const { outdir, projectDirname } = getCustomSetting(fsPath, CONST.CustomSettingFileName)
   if (outdir && projectDirname) {
-    const matchPosition = document.getWordRangeAtPosition(
-      position,
-      dollarTRegexp
-    )
+    const matchPosition = document.getWordRangeAtPosition(position, dollarTRegexp)
     if (matchPosition) {
       const i18nKey = document.getText(matchPosition)
       const msg = getHoverMsg(path.join(projectDirname, outdir), i18nKey)

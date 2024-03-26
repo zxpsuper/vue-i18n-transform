@@ -1,21 +1,13 @@
 import * as vscode from 'vscode'
-import CONST from './const'
-import {
-  showErrorMessage,
-  MarkdownString,
-  Range,
-  Position,
-  file,
-  open,
-  window
-} from './vscode'
-import { VueI18nInstance } from '../lib/i18nFile'
+import CONST from '../core/const'
+import { showErrorMessage, MarkdownString, Range, Position, file, open, window } from './vscode'
+import { VueI18nInstance } from '../core/i18nFile'
 
 const parse = require('json-to-ast')
 const path = require('path')
 const fs = require('fs')
 const validator = require('validator')
-const flatten = require("flat");
+const flatten = require('flat')
 
 /**打开文件默认配置 */
 const defaultOption = {
@@ -35,16 +27,19 @@ export function getCustomSetting(
   forceIgnoreCustomSetting = false
 ): any {
   const dirName = path.dirname(fsPath)
-
-  if (fs.existsSync(path.join(dirName, CONST.pkgFileName))) {
+  const root = path.parse(dirName).root
+  if (root === dirName) {
+    return VueI18nInstance.getConfig()
+  } else if (fs.existsSync(path.join(dirName, CONST.pkgFileName))) {
     const customPath = path.join(dirName, customConfigFileName + '.js')
     const customJSONPath = path.join(dirName, customConfigFileName + '.json')
     const fileExist = fs.existsSync(customPath) || fs.existsSync(customJSONPath)
 
-    const data =
-      fileExist && !forceIgnoreCustomSetting ? fs.readFileSync(customPath) : ''
+    const data = fileExist && !forceIgnoreCustomSetting ? fs.readFileSync(customPath) : ''
 
-    if (data === '') return VueI18nInstance.getConfig()
+    if (data === '') {
+      return VueI18nInstance.getConfig()
+    }
     let customSetting = validator.isJSON(data.toString())
       ? JSON.parse(data.toString())
       : eval(data.toString())
@@ -63,11 +58,7 @@ export function getCustomSetting(
       }
     }
   } else {
-    return getCustomSetting(
-      dirName,
-      customConfigFileName,
-      forceIgnoreCustomSetting
-    )
+    return getCustomSetting(dirName, customConfigFileName, forceIgnoreCustomSetting)
   }
 }
 
@@ -75,7 +66,7 @@ export function getCustomSetting(
  * 获取悬浮提示文本
  * @param dirname i18n输出文件夹
  * @param key i18n key
- * @returns 
+ * @returns
  */
 export function getHoverMsg(dirname: string, key: string) {
   if (fs.existsSync(dirname)) {
@@ -89,31 +80,31 @@ export function getHoverMsg(dirname: string, key: string) {
         let i18nObj
         try {
           i18nObj = !!data.toString() ? JSON.parse(data.toString()) : {}
-        }catch(err) {
+        } catch (err) {
           console.log(err)
-          showErrorMessage(`${langName}.json文件解析失败，请检查json格式是否错误或者文件编码格式是否为utf-8`)
+          showErrorMessage(
+            `${langName}.json文件解析失败，请检查json格式是否错误或者文件编码格式是否为utf-8`
+          )
           i18nObj = {}
         }
         // 展开
         const localeObj = flatten(i18nObj)
 
         // 打开文件
-        const name = `[\`${langName}\`](command:${CONST.command.openFile
-          }?${encodeURIComponent(
-            JSON.stringify({
-              fPath: itemPath
-            })
-          )} "Open '${item}'")`
+        const name = `[\`${langName}\`](command:${CONST.command.openFile}?${encodeURIComponent(
+          JSON.stringify({
+            fPath: itemPath
+          })
+        )} "Open '${item}'")`
 
         // 打开文件及当前key行数
         const link = localeObj[key]
-          ? `[${localeObj[key]}](command:${CONST.command.openFile
-          }?${encodeURIComponent(
-            JSON.stringify({
-              fPath: itemPath,
-              key
-            })
-          )} "Show In '${item}'")`
+          ? `[${localeObj[key]}](command:${CONST.command.openFile}?${encodeURIComponent(
+              JSON.stringify({
+                fPath: itemPath,
+                key
+              })
+            )} "Show In '${item}'")`
           : 'undefined'
 
         const current = `* _${name}_&nbsp;&nbsp;${link}\n`
@@ -147,16 +138,16 @@ const find = (ast: any, key: string) =>
 
 /**
  * 根据 key 获取其 ast 对象，可以获取到行数据
- * @param str 
- * @param keys 
- * @param wholeMatch 
- * @returns 
+ * @param str
+ * @param keys
+ * @param wholeMatch
+ * @returns
  */
 export function jsonAST(str: string, keys: string[], wholeMatch = false): any {
   const ast = parse(str)
   if (wholeMatch) {
     // 针对 一级 key 返回对应的对象
-    return find(ast, keys[0]);
+    return find(ast, keys[0])
   }
   // 多级 key 则遍历寻找到该 key
   let result = ast
@@ -180,13 +171,14 @@ export function jsonAST(str: string, keys: string[], wholeMatch = false): any {
 
 /**
  * 获取当前编辑
- * @param editor 
- * @returns 
+ * @param editor
+ * @returns
  */
 export const getEditor = (editor: vscode.TextEditor | undefined) => {
-  let currentEditor = editor || window.activeTextEditor;
-  const stopFlag =
-    !currentEditor || !CONST.langArray.includes(currentEditor.document.languageId);
-  if (stopFlag) return false;
-  return currentEditor;
-};
+  let currentEditor = editor || window.activeTextEditor
+  const stopFlag = !currentEditor || !CONST.langArray.includes(currentEditor.document.languageId)
+  if (stopFlag) {
+    return false
+  }
+  return currentEditor
+}

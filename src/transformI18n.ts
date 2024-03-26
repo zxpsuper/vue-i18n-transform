@@ -1,5 +1,5 @@
 import { registerCommand } from './utils/vscode'
-import CONST from './utils/const'
+import CONST from './core/const'
 import * as vscode from 'vscode'
 import { openFileByPath } from './utils'
 import transformJson from './lib/transformJson'
