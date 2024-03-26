@@ -104,4 +104,13 @@ describe('VueI18nInstance 测试', () => {
     const currentKey2 = VueI18nInstance.getCurrentKey('你好', 'testExample/origin/test.vue')
     expect(currentKey2).toBe('你好')
   })
+
+  it('删除所有数据', () => {
+    const VueI18nInstance = new VueI18n()
+    VueI18nInstance.mergeConfig({...config, projectDirname: process.cwd(), useChineseKey: true})
+    VueI18nInstance.setMessage({ haha_1: '撒', haha_2: '所'})
+    VueI18nInstance.deleteMessages()
+    const result = VueI18nInstance.getMessage().haha_1
+    expect(result).toBeUndefined()
+  })
 })

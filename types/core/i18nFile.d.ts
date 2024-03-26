@@ -43,6 +43,10 @@ export default class VueI18n {
     getCurrentKey(chinese: string, file: string): string;
     /**删除 message 中的键值 */
     deleteMessageKey(key: string): void;
+    /**
+     * 删除所有数据
+    */
+    deleteMessages(): void;
     private getPreKey;
     /**获取所有文件路径 */
     getAllFiles(dir: string): string[];

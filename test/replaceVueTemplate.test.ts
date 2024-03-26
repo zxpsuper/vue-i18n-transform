@@ -162,6 +162,19 @@ describe('replaceVueTemplate 测试', () => {
     expect(VueI18nInstance.getMessage().test_1).toBe(`名字{0}`)
   })
 
+  it('替换属性中的中文+变量', () => {
+    const content = `<template><div :name="'名字' + name"></div></template>`
+    const result = replaceVueTemplate(
+      content,
+      'testExample/origin/test.vue',
+      VueI18nInstance,
+      message
+    )
+    expect(result).toBe(
+      `<template><div :name="$t('test_1') + name"></div></template>`
+    )
+  })
+
   it('替换中文+变量+中文，名字{{name}}年龄', () => {
     const content = `<template>
       <div>名字{{name}}年龄</div>

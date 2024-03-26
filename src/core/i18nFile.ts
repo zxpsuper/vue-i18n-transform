@@ -105,17 +105,17 @@ export default class VueI18n {
     this.index = this.index + 1
     return key.toLowerCase()
   }
-
+  
   /**删除 message 中的键值 */
   deleteMessageKey(key: string) {
     delete this.messagesHash[this.messages[key]]
     delete this.messages[key]
   }
-
+  
   /**
    * 删除所有数据
-   */
-  deleteMessages() {
+  */
+ deleteMessages() {
     this.messagesHash = {}
     this.messages = {}
     this.index = 1

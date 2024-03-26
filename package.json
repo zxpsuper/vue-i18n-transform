@@ -1,12 +1,12 @@
 {
   "name": "vue-i18n-transform",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "vue-i18n 批量转换文件",
   "main": "lib/main.js",
   "scripts": {
     "test": "jest --coverage",
-    "test:watch": "jest test/replaceJavaScript.test.ts --watch --coverage",
-    "dev": "ts-node ./src/index.ts"
+    "test:watch": "jest test/recover.test.ts --watch --coverage",
+    "dev": "ts-node ./test.ts"
   },
   "directories": {
     "lib": "lib"
